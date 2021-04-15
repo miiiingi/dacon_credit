@@ -14,7 +14,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     for num_iter in range(args.num_ensemble) : 
         train_x, train_y = make_dataset('train.csv', 'train')
+        print(train_x.shape, train_y.shape)
         # 일단 제출해보고 결과가 나쁘면 loss fn 건드려 보자
-        estimator = HyperoptEstimator(classifier=random_forest('clf'), preprocessing=[], algo=tpe.suggest, max_evals= 30,  continuous_loss_fn=False)
-        estimator.fit(train_x, train_y)
+        estimator = HyperoptEstimator(classifier=random_forest('clf'), loss_fn = log_loss, continuous_loss_fn=True)
+        estimator.fit(train_x, train_y.values.ravel())
         dump(estimator, '{}_{}'.format(args.model, num_iter))
