@@ -38,6 +38,7 @@ def make_dataset(path, type) :
         data_x_concat = pd.concat([data_x_0, data_x_1, data_x_2])
         data_y_concat = pd.concat([data_y_0, data_y_1, data_y_2])
         data_x_dummy = pd.get_dummies(data_x_concat)
+        print(data_x_dummy.shape)
         data_x_scaled = scaler.fit_transform(data_x_dummy)
         data_x_scaled = data_x_scaled[:, 1:] 
         return data_x_scaled, data_y_concat
@@ -47,8 +48,6 @@ def make_dataset(path, type) :
         index_nan = dataset.loc[dataset.occyp_type.isnull(), 'occyp_type']
         dataset.loc[index_nan.index, 'occyp_type'] = 'unknown' 
         dataset.loc[(dataset.child_num>=4), 'child_num'] = 4
-        index_nan = dataset.loc[dataset.occyp_type.isnull(), 'occyp_type']
-        dataset.loc[index_nan.index, 'occyp_type'] = 'unknown' 
         dataset['child_num'].replace({0 : 'zero', 1:'one', 2 :'two', 3:'three', 4 : 'many'}, inplace=True)
         # family_size is closely correlated with child_num so delete family_size column.
         del dataset['family_size']
@@ -58,6 +57,7 @@ def make_dataset(path, type) :
         del dataset['FLAG_MOBIL']
         # prepare to datasets
         data_x_dummy = pd.get_dummies(dataset)
+        print(data_x_dummy.shape)
         data_x_scaled = scaler.fit_transform(data_x_dummy)
         data_x_scaled = data_x_scaled[:, 1:] 
         return data_x_scaled

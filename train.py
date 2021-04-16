@@ -59,7 +59,7 @@ if __name__ == "__main__":
             },
         ])
 
-        best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals=2)
+        best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals=1)
         best_result = space_eval(search_space, best_result)
         type_model = best_result['type']
         del best_result['type']
