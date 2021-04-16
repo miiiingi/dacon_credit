@@ -9,11 +9,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     for num_iter in range(args.num_ensemble) : 
         test_x = make_dataset('test.csv', 'test')
-        print(test_x[:5, :])
-        exit()
-        # 일단 제출해보고 결과가 나쁘면 loss fn 건드려 보자
-        estimator = load('{}_{}'.format(args.model, num_iter)) 
-        result = estimator.predict_proba(test_x)
+        best_model = load('result/model_{}'.format(num_iter)) 
+        result = best_model.predict_proba(test_x)
         print(result, result.shape)
         exit()
         # dump(estimator, '{}_{}'.format(args.model, num_iter))

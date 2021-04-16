@@ -62,15 +62,6 @@ def make_dataset(path, type) :
         data_x_scaled = data_x_scaled[:, 1:] 
         return data_x_scaled
 
-def fn_objective(model, params, train_x, train_y) : 
-    if model == 'randomforest' : 
-        params= {'max_depth' : params['max_depth'], 'max_leaf_nodes' : params['max_leaf_nodes'], 'n_estimators' : params['n_estimators']}
-        clf = RandomForestClassifier(random_state=722)
-        # result_clf = GridSearchCV(clf, param_grid=params, cv = 5, scoring='neg_log_loss')
-        result_clf = GridSearchCV(clf, param_grid = [], cv = 5, scoring='neg_log_loss')
-
-
-        return result_clf.score(train_x, train_y) 
     # elif model == 'svm' : 
     #     gridsearch_svm = GridSearchCV(SVC(probability=True, random_state=722), param_grid=param_grid_svm, cv = 5, scoring='neg_log_loss')
     #     gridsearch_svm.fit(train_x, train_y)
