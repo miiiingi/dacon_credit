@@ -30,10 +30,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='dacon_credit prediction') 
     parser.add_argument("--num_ensemble", type=int, default=10)
     args = parser.parse_args()
-    if os.path.isdir('result') == False : 
-        os.makedirs('result')
+    if os.path.isdir('result_wholenormal') == False : 
+        os.makedirs('result_wholenormal')
     for num_iter in range(args.num_ensemble) : 
-        train_x, train_y = make_dataset('train.csv', 'train')
+        train_x, train_y = make_dataset('train')
         search_space = hp.choice('classifier_type', [
             {
                 'type' : 'randomforest',
@@ -59,7 +59,7 @@ if __name__ == "__main__":
             },
         ])
 
-        best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals=1)
+        best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals=2)
         best_result = space_eval(search_space, best_result)
         type_model = best_result['type']
         del best_result['type']
@@ -71,4 +71,4 @@ if __name__ == "__main__":
         elif type_model == 'randomforest' : 
             clf = RandomForestClassifier(random_state=722, **type_parameter)
         clf.fit(train_x, train_y)
-        dump(clf, 'result/model_{}'.format(num_iter))
+        dump(clf, 'result_wholenormal/model_{}'.format(num_iter))
