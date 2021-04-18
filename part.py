@@ -26,6 +26,7 @@ def make_dataset(type) :
     del dataset['phone']
     del dataset['email']
     del dataset['FLAG_MOBIL']
+    print(pd.get_dummies(dataset.iloc[:, :-1]).columns)
     scaler_whole = scaler.fit(pd.get_dummies(dataset.iloc[:,:-1]))
     if type == 'train' : 
         # prepare to datasets(down-sampling for considering imbalance data label)
@@ -37,12 +38,13 @@ def make_dataset(type) :
         data_x_concat = data_concat.iloc[:, :-1]
         data_y_concat = data_concat.iloc[:, -1]
         data_x_dummy = pd.get_dummies(data_x_concat)
+        print(data_x_dummy.columns)
         data_x_scaled = scaler_whole.transform(data_x_dummy)
         data_x_scaled = data_x_scaled[:, 1:] 
         return data_x_scaled, data_y_concat
 
     elif type == 'test' : 
-        data_concat = dataset.loc[dataset['credit'].isnull(), :].iloc[:, :-1].head()
+        data_concat = dataset.loc[dataset['credit'].isnull(), :].iloc[:, :-1]
         data_x_dummy = pd.get_dummies(data_concat)
         data_x_scaled = scaler_whole.transform(data_x_dummy)
         data_x_scaled = data_x_scaled[:, 1:] 

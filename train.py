@@ -24,29 +24,31 @@ def fn_objective(params) :
     else : 
         return 0
     loss = cross_val_score(clf, train_x, train_y, cv = 5, scoring = 'neg_log_loss').mean()
-    return {'loss' : loss, 'status' : STATUS_OK} 
+    return {'loss' : -loss, 'status' : STATUS_OK} 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='dacon_credit prediction') 
     parser.add_argument("--num_ensemble", type=int, default=10)
+    parser.add_argument("--model", type=str, default='xgboost')
+
     args = parser.parse_args()
-    if os.path.isdir('result_wholenormal') == False : 
-        os.makedirs('result_wholenormal')
+    if os.path.isdir('result_{}'.format(args.model)) == False : 
+        os.makedirs('result_{}'.format(args.model))
     for num_iter in range(args.num_ensemble) : 
         train_x, train_y = make_dataset('train')
         search_space = hp.choice('classifier_type', [
-            {
-                'type' : 'randomforest',
-                'max_depth' : hp.choice('max_depth_rf', np.arange(1, 20, dtype=int)),
-                'max_leaf_nodes' : hp.choice('max_leaf_nodes_rf', np.arange(1, 50, dtype=int)),
-                'n_estimators' : hp.choice('n_estimators_rf', np.arange(10, 200, dtype = int))
-            },
-            {
-                'type' : 'svm',
-                'C' : hp.uniform('C_svm', 0.001, 10),
-                'gamma' : hp.uniform('gamma_svm', 0.01, 10),
-                'kernel' : hp.choice('kernel_svm', ['linear','rbf'])
-            },
+            # {
+            #     'type' : 'randomforest',
+            #     'max_depth' : hp.choice('max_depth_rf', np.arange(1, 20, dtype=int)),
+            #     'max_leaf_nodes' : hp.choice('max_leaf_nodes_rf', np.arange(1, 50, dtype=int)),
+            #     'n_estimators' : hp.choice('n_estimators_rf', np.arange(10, 200, dtype = int))
+            # },
+            # {
+            #     'type' : 'svm',
+            #     'C' : hp.uniform('C_svm', 0.001, 10),
+            #     'gamma' : hp.uniform('gamma_svm', 0.01, 10),
+            #     'kernel' : hp.choice('kernel_svm', ['linear','rbf'])
+            # },
             {
                 'type' : 'xgboost',
                 'max_depth' : hp.choice('max_depth_xg', np.arange(3, 10, dtype=int)),
@@ -59,7 +61,7 @@ if __name__ == "__main__":
             },
         ])
 
-        best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals=2)
+        best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals=256)
         best_result = space_eval(search_space, best_result)
         type_model = best_result['type']
         del best_result['type']
@@ -71,4 +73,6 @@ if __name__ == "__main__":
         elif type_model == 'randomforest' : 
             clf = RandomForestClassifier(random_state=722, **type_parameter)
         clf.fit(train_x, train_y)
-        dump(clf, 'result_wholenormal/model_{}'.format(num_iter))
+        dump(clf, 'result_{}/model_{}'.format(args.model, num_iter))
+        del train_x
+        del train_y

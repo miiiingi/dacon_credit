@@ -5,11 +5,12 @@ import argparse
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='dacon_credit prediction') 
     parser.add_argument("--num_ensemble", type=int, default=10)
+    parser.add_argument("--model", type=str, default='xgboost')
     args = parser.parse_args()
     for num_iter in range(args.num_ensemble) : 
         print('[{}/{}]'.format(num_iter+1, args.num_ensemble+1))
-        test_x = make_dataset('test.csv', 'test')
-        best_model = load('result/model_{}'.format(num_iter)) 
+        test_x = make_dataset('test')
+        best_model = load('result_{}/model_{}'.format(args.model, num_iter)) 
         try : 
             result = best_model.predict_proba(test_x)
             if num_iter == 0 : 
