@@ -8,7 +8,7 @@ if __name__ == "__main__":
     parser.add_argument("--model", type=str, default='xgboost')
     args = parser.parse_args()
     for num_iter in range(args.num_ensemble) : 
-        print('[{}/{}]'.format(num_iter+1, args.num_ensemble+1))
+        print('[{}/{}]'.format(num_iter+1, args.num_ensemble))
         test_x = make_dataset('test')
         best_model = load('result_{}/model_{}'.format(args.model, num_iter)) 
         try : 
