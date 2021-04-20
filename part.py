@@ -37,11 +37,3 @@ def make_dataset(type) :
         data_x_scaled = scaler_whole.transform(data_x_dummy)
         # data_x_scaled = data_x_scaled[:, 1:] 
         return data_x_scaled
-        # prepare to datasets(down-sampling for considering imbalance data label)
-        # length_0 = dataset.loc[dataset['credit']==0, :].shape[0]
-        # data_0 = sampling_func(dataset.loc[dataset['credit']==0, :], length_0)
-        # data_1 = sampling_func(dataset.loc[dataset['credit']==1, :], length_0)
-        # data_2 = sampling_func(dataset.loc[dataset['credit']==2, :], length_0)
-        # data_concat = pd.concat([data_0, data_1, data_2])
-        # data_x_concat = data_concat.iloc[:, :-1]
-        # data_y_concat = data_concat.iloc[:, -1]

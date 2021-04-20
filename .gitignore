@@ -132,3 +132,4 @@ result/
 *.csv
 hyperopt-sklearn/
 model*
+*.png
