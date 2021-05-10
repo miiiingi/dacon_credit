@@ -20,9 +20,18 @@ def graph_binaryvariable(path) :
     plt.show()
 # 1. graph binary variable 
 # graph_binaryvariable('train.csv')
-def sexandcarreality(path) :
+def inspect_birthday(path) :
     trainset = pd.read_csv(path)
-    # print(len(trainset[trainset['credit']==2].loc[trainset['reality']=='Y'])/len(trainset[trainset['reality']=='Y']))
-    print(len(trainset[trainset['gender']=='M'])/len(trainset))
-sexandcarreality('train.csv')
+    trainset['DAYS_BIRTH'] = (-trainset['DAYS_BIRTH'])//365
+    group_age_2 = trainset[(trainset['DAYS_BIRTH'] < 30) & (20 <= trainset['DAYS_BIRTH'])]
+    group_age_3 = trainset[(trainset['DAYS_BIRTH'] < 40) & (30 <= trainset['DAYS_BIRTH'])]
+    group_age_4 = trainset[(trainset['DAYS_BIRTH'] < 50) & (40 <= trainset['DAYS_BIRTH'])]
+    group_age_5 = trainset[(trainset['DAYS_BIRTH'] < 60) & (50 <= trainset['DAYS_BIRTH'])]
+    group_age_6 = trainset[(trainset['DAYS_BIRTH'] < 70) & (60 <= trainset['DAYS_BIRTH'])]
+    agelist = [[] for _ in range(5)]
+    for age in agelist : 
+        for credit in [x for x in range(3)] : 
+            print(sum(group_age_6['credit'] == credit)/len(group_age_6))
+
+inspect_birthday('train.csv')
 
