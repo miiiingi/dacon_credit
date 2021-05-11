@@ -38,6 +38,7 @@ if __name__ == "__main__":
         os.makedirs('result_{}'.format(args.model))
     for num_iter in range(args.num_ensemble) : 
         train_x, train_y = make_dataset('train')
+        exit()
         search_space = hp.choice('classifier_type', [
             {
                 'type' : 'randomforest',
