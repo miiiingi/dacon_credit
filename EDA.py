@@ -27,23 +27,29 @@ def graph_binary(path) :
         plt.savefig('binary/{}.png'.format(variable))
         plt.clf()
 
-def graph_marriage(path) : 
+def graph_marriage(path) : # 추가변수 후보 2 : 가족형태에 따른 더미변수 추가 
     trainset = pd.read_csv(path)
-    variable_marriage = trainset['family_type'].unique()
-    print(variable_marriage)
     if os.path.isdir('family_type') == False : 
         os.makedirs('family_type')
-    for variable in variable_marriage : 
-        trainset_gender = trainset.groupby(['family_type'])['credit'].value_counts(normalize=True)
-        trainset_gender.plot.bar(grid = True)
-        plt.savefig('family_type/{}.png'.format(variable))
-        plt.clf()
+    trainset_marriage = trainset.groupby(['family_type'])['credit'].value_counts(normalize=True)
+    trainset_marriage.plot.bar(grid = True)
+    plt.tight_layout()
+    plt.savefig('family_type/marriage.png')
+def graph_house(path) : # 추가변수 후보 3 : 주거형태에 따른 더미변수 추가 
+    trainset = pd.read_csv(path)
+    if os.path.isdir('house_type') == False : 
+        os.makedirs('house_type')
+    trainset_marriage = trainset.groupby(['house_type'])['credit'].value_counts(normalize=True)
+    trainset_marriage.plot.bar(grid = True)
+    plt.tight_layout()
+    plt.savefig('house_type/house.png')
 
 
 # binary_graph = graph_binaryvariable('train.csv')
 birthday = inspect_birthday('train.csv')
 graph_binary('train.csv')
 graph_marriage('train.csv')
+graph_house('train.csv')
 
 
 
