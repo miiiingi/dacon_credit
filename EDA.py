@@ -85,18 +85,7 @@ def graph_child(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 
     plt.tight_layout()
     plt.savefig('child_num/child_num.png')
 
-def graph_days_employed(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
-    trainset = pd.read_csv(path)
-    if os.path.isdir('days_employed') == False : 
-        os.makedirs('days_employed')
-    trainset.loc[trainset['DAYS_EMPLOYED'] > 0, 'DAYS_EMPLOYED'] = 1
-    trainset.loc[trainset['DAYS_EMPLOYED'] < 0, 'DAYS_EMPLOYED'] = 0
-    trainset_days_employed = trainset.groupby(['DAYS_EMPLOYED'])['credit'].value_counts(normalize=True)
-    trainset_days_employed.plot.bar(grid = True)
-    plt.tight_layout()
-    plt.savefig('days_employed/days_employed.png')
-
-def graph_days_employed2(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+def graph_days_employed2(path) : # 추가변수 후보 8 : 고용형태 >>  현재 은퇴한 사람과 은퇴하지 않은 사람간의 차이가 있는지 보려고 만든 변수 그렇게 큰 차이는 없음..
     trainset = pd.read_csv(path)
     if os.path.isdir('days_employed') == False : 
         os.makedirs('days_employed')
@@ -113,7 +102,7 @@ def graph_days_employed2(path) : # 추가변수 후보 7 : 아이수에 따른 �
     plt.tight_layout()
     plt.savefig('days_employed/days_employed2.png')
 
-def graph_occpy(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+def graph_occpy(path) : # 추가변수 후보 9 고용형태와 직업 >> 고용되어 있지 않지만, 은퇴한 사람과 고용되어 있지 않지만, 은퇴하지 않은 사람에 대한 변수 아주 미묘하지만 차이가 있음..
     trainset = pd.read_csv(path)
     if os.path.isdir('days_occpy') == False : 
         os.makedirs('days_occpy')
@@ -124,7 +113,7 @@ def graph_occpy(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 
     plt.tight_layout()
     plt.savefig('days_occpy/days_occpy.png')
 
-def graph_begin_month(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+def graph_begin_month(path) : # 추가변수 후보 10 : 신용카드 발급기간 >> 신용카드 발급을 받은 기간이 얼마 인지에 따라 아주 미묘한 차이가 있음 
     trainset = pd.read_csv(path)
     if os.path.isdir('begin_month') == False : 
         os.makedirs('begin_month')
@@ -140,7 +129,6 @@ def graph_begin_month(path) : # 추가변수 후보 7 : 아이수에 따른 분�
     plt.tight_layout()
     plt.savefig('begin_month/begin_month.png')
 
-# 다음에 볼 것 : 근속년수 등급화 / occyp_type에서 빈칸에 대한 해석 / 모델 최적화 
 # binary_graph = graph_binaryvariable('train.csv')
 # birthday = inspect_birthday('train.csv')
 # graph_binary('train.csv')
@@ -150,7 +138,6 @@ def graph_begin_month(path) : # 추가변수 후보 7 : 아이수에 따른 분�
 # graph_edu('train.csv')
 # graph_occyp('train.csv')
 # graph_child('train.csv')
-# graph_days_employed('train.csv')
 # graph_days_employed2('train.csv')
 graph_occpy('train.csv')
 graph_begin_month('train.csv')
