@@ -1,7 +1,10 @@
+from numpy.core.defchararray import upper
 import pandas as pd 
 import seaborn as sns
 import matplotlib.pyplot as plt
 import os
+import numpy as np 
+import copy
 def inspect_birthday(path) : # 추가변수 후보 1 : 나이에 따른 더미변수 추가 >> 더 생각해볼 것 : 365를 기준으로 몫만 취하는 것이 맞는가 ?? > 몫만 취하게 되면 364일은 아무것도 아니게 되니까
     # 그리고 20, 30, 40 대 등으로 나누는 것이 맞는가 ?? >> 기준이 어디인지 모르니까 다르게 나눠보자 !
     trainset = pd.read_csv(path)
@@ -82,15 +85,75 @@ def graph_child(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 
     plt.tight_layout()
     plt.savefig('child_num/child_num.png')
 
+def graph_days_employed(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+    trainset = pd.read_csv(path)
+    if os.path.isdir('days_employed') == False : 
+        os.makedirs('days_employed')
+    trainset.loc[trainset['DAYS_EMPLOYED'] > 0, 'DAYS_EMPLOYED'] = 1
+    trainset.loc[trainset['DAYS_EMPLOYED'] < 0, 'DAYS_EMPLOYED'] = 0
+    trainset_days_employed = trainset.groupby(['DAYS_EMPLOYED'])['credit'].value_counts(normalize=True)
+    trainset_days_employed.plot.bar(grid = True)
+    plt.tight_layout()
+    plt.savefig('days_employed/days_employed.png')
+
+def graph_days_employed2(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+    trainset = pd.read_csv(path)
+    if os.path.isdir('days_employed') == False : 
+        os.makedirs('days_employed')
+    trainset.loc[trainset['DAYS_EMPLOYED'] < 0, 'DAYS_EMPLOYED'] = -trainset.loc[trainset['DAYS_EMPLOYED'] < 0, 'DAYS_EMPLOYED']
+    trainset.loc[trainset['DAYS_EMPLOYED'] == 365243, 'DAYS_EMPLOYED'] = 0
+    x = copy.deepcopy(trainset)
+    lower = np.percentile(x['DAYS_EMPLOYED'], 0)  
+    for p in range(10, 110, 10) : 
+        upper = np.percentile(x['DAYS_EMPLOYED'], p) 
+        trainset.loc[((lower <= trainset['DAYS_EMPLOYED']) & (trainset['DAYS_EMPLOYED'] <= upper)), 'DAYS_EMPLOYED'] = p // 10
+        lower = upper
+    trainset_days_employed = trainset.groupby(['DAYS_EMPLOYED'])['credit'].value_counts(normalize=True)
+    trainset_days_employed.plot.bar(grid = True)
+    plt.tight_layout()
+    plt.savefig('days_employed/days_employed2.png')
+
+def graph_occpy(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+    trainset = pd.read_csv(path)
+    if os.path.isdir('days_occpy') == False : 
+        os.makedirs('days_occpy')
+    trainset.loc[trainset['occyp_type'].isnull() & (trainset['DAYS_EMPLOYED'] == 365243), 'occyp_type'] = 1
+    trainset.loc[trainset['occyp_type'].isnull() & (trainset['DAYS_EMPLOYED'] != 365243), 'occyp_type'] = 0
+    trainset_days_employed = trainset.groupby(['occyp_type'])['credit'].value_counts(normalize=True)
+    trainset_days_employed.plot.bar(grid = True)
+    plt.tight_layout()
+    plt.savefig('days_occpy/days_occpy.png')
+
+def graph_begin_month(path) : # 추가변수 후보 7 : 아이수에 따른 분석 >> 가족형태랑 다시 조사해보기 (한 명 이었을 때, 상대적으로 낮은데, 이것이 과부랑 관련?)
+    trainset = pd.read_csv(path)
+    if os.path.isdir('begin_month') == False : 
+        os.makedirs('begin_month')
+    x = copy.deepcopy(trainset)
+    lower = np.percentile(x['begin_month'], 0)  
+    for p in range(10, 110, 10) : 
+        upper = np.percentile(x['begin_month'], p) 
+        print('{}~{}'.format(lower, upper))
+        trainset.loc[((lower <= trainset['begin_month']) & (trainset['begin_month'] <= upper)), 'begin_month'] = p // 10
+        lower = upper
+    trainset_days_employed = trainset.groupby(['begin_month'])['credit'].value_counts(normalize=True)
+    trainset_days_employed.plot.bar(grid = True)
+    plt.tight_layout()
+    plt.savefig('begin_month/begin_month.png')
+
+# 다음에 볼 것 : 근속년수 등급화 / occyp_type에서 빈칸에 대한 해석 / 모델 최적화 
 # binary_graph = graph_binaryvariable('train.csv')
-birthday = inspect_birthday('train.csv')
-graph_binary('train.csv')
-graph_marriage('train.csv')
-graph_house('train.csv')
-graph_income('train.csv')
-graph_edu('train.csv')
-graph_occyp('train.csv')
-graph_child('train.csv')
+# birthday = inspect_birthday('train.csv')
+# graph_binary('train.csv')
+# graph_marriage('train.csv')
+# graph_house('train.csv')
+# graph_income('train.csv')
+# graph_edu('train.csv')
+# graph_occyp('train.csv')
+# graph_child('train.csv')
+# graph_days_employed('train.csv')
+# graph_days_employed2('train.csv')
+graph_occpy('train.csv')
+graph_begin_month('train.csv')
 
 
 
