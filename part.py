@@ -1,4 +1,6 @@
 import numpy as np
+from numpy.lib.shape_base import column_stack
+from scipy.sparse import data
 from sklearn.preprocessing import StandardScaler 
 import pandas as pd
 import copy
@@ -35,43 +37,50 @@ def divide_begin_month(dataset) :
         lower = upper
     return dataset
 
-def sampling_func(data, num_sample):
-    N = len(data)
-    sample = data.take(np.random.permutation(N)[:num_sample])
-    return sample
+def scaling(dataset, columns) :  
+    for column in columns : 
+        dataset[column] = (dataset[column] - min(dataset[column])) / (max(dataset[column]) - min(dataset[column]))
+    return dataset
 
 def make_dataset(type) : 
     scaler = StandardScaler()
     trainset = pd.read_csv('train.csv')
     testset = pd.read_csv('test.csv')
     dataset = pd.concat([trainset, testset])
-    index_retire = dataset.loc[dataset['occyp_type'].isnull() & (dataset['DAYS_EMPLOYED'] == 365243), 'occyp_type']
-    index_notretire = dataset.loc[dataset['occyp_type'].isnull() & (dataset['DAYS_EMPLOYED'] != 365243), 'occyp_type']
-    dataset.loc[index_retire.index, 'occyp_type'] = 'retire' 
-    dataset.loc[index_notretire.index, 'occyp_type'] = 'notretire' 
-    dataset.loc[(dataset.child_num>=4), 'child_num'] = 4
+
+    # columns_numerical = ['income_total', 'DAYS_BIRTH', 'DAYS_EMPLOYED', 'begin_month']
+    # index_retire = dataset.loc[dataset['occyp_type'].isnull() & (dataset['DAYS_EMPLOYED'] == 365243), 'occyp_type']
+    # index_notretire = dataset.loc[dataset['occyp_type'].isnull() & (dataset['DAYS_EMPLOYED'] != 365243), 'occyp_type']
+    dataset.loc[dataset.loc[dataset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
+    # dataset.loc[index_retire.index, 'occyp_type'] = 'retire' 
+    # dataset.loc[index_notretire.index, 'occyp_type'] = 'notretire' 
+    dataset.loc[dataset['child_num'] >= 5, 'child_num'] = 5
+    # dataset['DAYS_BIRTH'] = (-(dataset['DAYS_BIRTH']) // 30)
+    # dataset['DAYS_EMPLOYED'] = (-(dataset['DAYS_EMPLOYED']) // 30)
+    # dataset.loc[(dataset['DAYS_EMPLOYED'] == 0), 'DAYS_EMPLOYED'] = max(dataset['DAYS_EMPLOYED']) 
+    # dataset['begin_month'] = (-(dataset['begin_month']))
+    # dataset = scaling(dataset, columns_numerical)
+    # dataset.loc[(dataset['DAYS_EMPLOYED'] == 0), 'DAYS_EMPLOYED'] = max(dataset['DAYS_EMPLOYED'])
     # family_size is closely correlated with child_num so delete family_size column.
-    dataset['child_num'].replace({0 : 'zero', 1:'one', 2 :'two', 3:'three', 4 : 'many'}, inplace=True)
-    dataset = divide_age(dataset)
-    dataset = divide_employed(dataset)
-    dataset = divide_begin_month(dataset)
-    del dataset['family_size']
+    # dataset['child_num'].replace({0 : 'zero', 1:'one', 2 :'two', 3:'three', 4 : 'many'}, inplace=True)
+    # dataset = divide_age(dataset)
+    # dataset = divide_employed(dataset)
+    # dataset = divide_begin_month(dataset)
     # delete unnessary variables
-    del dataset['phone']
-    del dataset['email']
-    del dataset['FLAG_MOBIL']
-    del dataset['index']
-    scaler_whole = scaler.fit(pd.get_dummies(dataset.iloc[:,:-1]))
+    # scaler_whole = scaler.fit(pd.get_dummies(dataset.iloc[:,:-1]).loc[:,['income_total','DAYS_BIRTH','DAYS_EMPLOYED','begin_month']])
+    scaler_whole = scaler.fit(pd.get_dummies(dataset.loc[:,dataset.columns != 'credit']))
 
     if type == 'train' : 
-        data_x_concat = dataset.loc[dataset['credit'].isnull()==False,:].iloc[:, :-1]
-        data_y_concat = dataset.loc[dataset['credit'].isnull()==False,:].iloc[:, -1]
+        data_x_concat = dataset.loc[dataset['credit'].isnull()==False,:].loc[:,dataset.columns != 'credit']
+        data_y_concat = dataset.loc[dataset['credit'].isnull()==False,:].loc[:, 'credit']
         data_x_dummy = pd.get_dummies(data_x_concat)
         data_x_scaled = scaler_whole.transform(data_x_dummy)
+        # data_x_scaled = scaler_whole.transform(data_x_dummy.iloc[:,:-1].loc[:,['income_total','DAYS_BIRTH','DAYS_EMPLOYED','begin_month']])
         return data_x_scaled, data_y_concat
 
     elif type == 'test' : 
-        data_concat = dataset.loc[dataset['credit'].isnull()==True, :].iloc[:, :-1]
+        data_concat = dataset.loc[dataset['credit'].isnull()==True, :].loc[:,dataset.columns != 'credit']
         data_x_dummy = pd.get_dummies(data_concat)
         data_x_scaled = scaler_whole.transform(data_x_dummy)
+        # data_x_scaled = scaler_whole.transform(data_x_dummy.iloc[:,:-1].loc[:,['income_total','DAYS_BIRTH','DAYS_EMPLOYED','begin_month']])
         return data_x_scaled
