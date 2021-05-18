@@ -17,8 +17,8 @@ import os
 def fn_objective(params) : 
     classifier_type = params['type']
     del params['type']
-    if classifier_type == 'svm' : 
-        clf = SVC(random_state=722, probability = True, **params)
+    if classifier_type == 'lightgbm' : 
+        clf = LGBMClassifier(random_state=722, **params)
     elif classifier_type == 'xgboost' : 
         clf = XGBClassifier(random_state=722, objective = 'multi:softprob', use_label_encoder=False, **params)
     elif classifier_type == 'randomforest' : 
@@ -47,24 +47,24 @@ if __name__ == "__main__":
             #     'max_leaf_nodes' : hp.choice('max_leaf_nodes_rf', np.arange(1, 100, dtype=int)),
             #     'n_estimators' : hp.choice('n_estimators_rf', np.arange(100, 1000, dtype = int))
             # },
-            # {
-            #     'type' : 'lightgbm',
-            #     'max_depth' : hp.choice('max_depth_lightgbm', np.arange(1, 100, dtype=int)),
-            #     'min_child_samples' : hp.choice('min_child_samples_lightgbm', np.arange(1, 100, dtype=int)),
-            #     'subsample' : hp.uniform('subsample_lightgbm', 0.5, 1),
-            #     'n_estimators' : hp.choice('n_estimators_lightgbm', np.arange(100, 1000, dtype = int))
-            # },
             {
-                'type' : 'xgboost',
-                'eval_metric' : 'mlogloss', 
-                'max_depth' : hp.choice('max_depth_xg', np.arange(3, 10, dtype=int)),
-                'subsample' : hp.uniform('subsample_xg', 0.5, 1),
-                'colsample_bytree' : hp.uniform('colsample_bytree_xg', 0.5, 1),
-                'n_estimators' : hp.choice('n_estimators_xg', np.arange(10, 200, dtype = int)),
-                'min_child_weight' : hp.choice('min_child_weight_xg', np.arange(3, 10, dtype = int)),
-                'gamma' : hp.uniform('gamma_xg', 0, 0.5),
-                'reg_alpha' : hp.uniform('reg_alpha', 0, 0.05),
+                'type' : 'lightgbm',
+                'max_depth' : hp.choice('max_depth_lightgbm', np.arange(1, 100, dtype=int)),
+                'min_child_samples' : hp.choice('min_child_samples_lightgbm', np.arange(1, 100, dtype=int)),
+                'subsample' : hp.uniform('subsample_lightgbm', 0.5, 1),
+                'n_estimators' : hp.choice('n_estimators_lightgbm', np.arange(100, 1000, dtype = int))
             },
+            # {
+            #     'type' : 'xgboost',
+            #     'eval_metric' : 'mlogloss', 
+            #     'max_depth' : hp.choice('max_depth_xg', np.arange(3, 10, dtype=int)),
+            #     'subsample' : hp.uniform('subsample_xg', 0.5, 1),
+            #     'colsample_bytree' : hp.uniform('colsample_bytree_xg', 0.5, 1),
+            #     'n_estimators' : hp.choice('n_estimators_xg', np.arange(10, 200, dtype = int)),
+            #     'min_child_weight' : hp.choice('min_child_weight_xg', np.arange(3, 10, dtype = int)),
+            #     'gamma' : hp.uniform('gamma_xg', 0, 0.5),
+            #     'reg_alpha' : hp.uniform('reg_alpha', 0, 0.05),
+            # },
         ])
 
         best_result = fmin(fn = fn_objective, space = search_space, algo = tpe.suggest, max_evals = 128)
