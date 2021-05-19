@@ -98,7 +98,8 @@ def make_dataset(type) :
     trainset_onehot = pd.DataFrame(enc.transform(trainset.loc[:,object_col]).toarray(), columns=enc.get_feature_names(object_col))
     trainset.drop(object_col, axis= 1, inplace=True)
     trainset_concat = pd.concat([trainset, trainset_onehot], axis= 1)
-
+    trainset_concat.loc[trainset_concat.duplicated(), 'duplicated'] = 1
+    trainset_concat.loc[trainset_concat.duplicated() == False, 'duplicated'] = 0 
     testset = pd.read_csv('test.csv')
     testset.drop('index', axis = 1, inplace=True)
     testset.loc[testset.loc[testset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
@@ -111,6 +112,8 @@ def make_dataset(type) :
     testset_onehot = pd.DataFrame(enc.transform(testset.loc[:,object_col]).toarray(), columns=enc.get_feature_names(object_col))
     testset.drop(object_col, axis= 1, inplace=True)
     testset_concat = pd.concat([testset, testset_onehot], axis= 1)
+    testset_concat.loc[testset_concat.duplicated(), 'duplicated'] = 1
+    testset_concat.loc[testset_concat.duplicated() == False, 'duplicated'] = 0 
 
     if type == 'train' : 
         data_x = trainset_concat.loc[:,trainset_concat.columns != 'credit']
