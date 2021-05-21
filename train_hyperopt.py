@@ -48,6 +48,8 @@ if __name__ == "__main__":
             # },
             {
                 'type' : 'xgboost',
+                # 'predictor' : 'gpu_predictor',
+                # 'tree_method' : 'gpu_hist',
                 'eval_metric' : 'mlogloss', 
                 'max_depth' : hp.choice('max_depth_xg', np.arange(3, 10, dtype=int)),
                 'subsample' : hp.uniform('subsample_xg', 0.5, 1),
@@ -56,7 +58,7 @@ if __name__ == "__main__":
                 'min_child_weight' : hp.choice('min_child_weight_xg', np.arange(3, 10, dtype = int)),
                 'gamma' : hp.uniform('gamma_xg', 0, 0.5),
                 'reg_alpha' : hp.uniform('reg_alpha', 0, 0.05),
-                'eta' : hp.uniform('eta_xg', 0.01, 0.3)
+                'eta' : hp.uniform('eta_xg', 0.01, 0.4)
             },
         ])
 

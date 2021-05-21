@@ -1,3 +1,4 @@
+from part import make_dataset
 from numpy.core.defchararray import upper
 import pandas as pd 
 import seaborn as sns
@@ -129,6 +130,20 @@ def graph_begin_month(path) : # 추가변수 후보 10 : 신용카드 발급기�
     plt.tight_layout()
     plt.savefig('begin_month/begin_month.png')
 
+def make_tsne(dataset_x, dataset_y) : 
+    from sklearn.manifold import TSNE
+    colors = ['#476A2A', '#7851B8', '#BD3430']
+    tsne = TSNE(random_state=722)
+    result_tsne = tsne.fit_transform(dataset_x)
+    plt.figure(figsize=(10, 10))
+    plt.xlim(result_tsne[:, 0].min(), result_tsne[:, 0].max() + 1)
+    plt.ylim(result_tsne[:, 1].min(), result_tsne[:, 1].max() + 1)
+    for i in range(len(dataset_x)) : 
+        plt.text(result_tsne[i, 0], result_tsne[i, 1], str(dataset_y[i]), color = colors[dataset_y[i]], fontdict = {'weight' : 'bold', 'size' : 9})
+    plt.xlabel('character0')
+    plt.ylabel('character1')
+    plt.savefig('tsne.png')
+
 # binary_graph = graph_binaryvariable('train.csv')
 # birthday = inspect_birthday('train.csv')
 # graph_binary('train.csv')
@@ -139,8 +154,11 @@ def graph_begin_month(path) : # 추가변수 후보 10 : 신용카드 발급기�
 # graph_occyp('train.csv')
 # graph_child('train.csv')
 # graph_days_employed2('train.csv')
-graph_occpy('train.csv')
-graph_begin_month('train.csv')
+# graph_occpy('train.csv')
+# graph_begin_month('train.csv')
+data_x, data_y = make_dataset('train')
+make_tsne(data_x, data_y)
+
 
 
 

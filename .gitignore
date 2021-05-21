@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 result/
-# *.csv
+*.csv
 hyperopt-sklearn/
 model*
 *.png

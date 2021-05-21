@@ -90,6 +90,13 @@ def make_dataset(type) :
     trainset = pd.read_csv('train.csv')
     trainset.drop('index', axis = 1, inplace=True)
     trainset.loc[trainset.loc[trainset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
+    trainset['identity'] = [str(i) + str(j) + str(k) + str(l) + str(m) for i,j,k,l,m in zip(trainset['gender'],trainset['income_total'],trainset['income_type'],trainset['DAYS_BIRTH'],trainset['DAYS_EMPLOYED'])] #
+    for index, value in zip(trainset['identity'].value_counts().index, trainset['identity'].value_counts()) : #
+        if value > 1 : 
+            trainset.loc[trainset['identity'] == index, 'derivatives_begin_month'] = 0 
+        else :  
+            trainset.loc[trainset['identity'] == index, 'derivatives_begin_month'] = 1 
+    trainset.drop('identity', axis = 1, inplace=True) #
     object_col = [] 
     for col in trainset.columns : 
         if trainset[col].dtype == 'object' : 
@@ -98,11 +105,20 @@ def make_dataset(type) :
     trainset_onehot = pd.DataFrame(enc.transform(trainset.loc[:,object_col]).toarray(), columns=enc.get_feature_names(object_col))
     trainset.drop(object_col, axis= 1, inplace=True)
     trainset_concat = pd.concat([trainset, trainset_onehot], axis= 1)
-    trainset_concat.loc[trainset_concat.duplicated(), 'duplicated'] = 1
-    trainset_concat.loc[trainset_concat.duplicated() == False, 'duplicated'] = 0 
+
+    # trainset_concat.loc[trainset_concat.duplicated(), 'duplicated'] = 1
+    # trainset_concat.loc[trainset_concat.duplicated() == False, 'duplicated'] = 0 
     testset = pd.read_csv('test.csv')
     testset.drop('index', axis = 1, inplace=True)
     testset.loc[testset.loc[testset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
+    testset['identity'] = [str(i) + str(j) + str(k) + str(l) + str(m) for i,j,k,l,m in zip(testset['gender'],testset['income_total'],testset['income_type'],testset['DAYS_BIRTH'],testset['DAYS_EMPLOYED'])] #
+    for index, value in zip(testset['identity'].value_counts().index, testset['identity'].value_counts()) : #
+        if value > 1 : 
+            testset.loc[testset['identity'] == index, 'derivatives_begin_month'] = 0  
+        else :  
+            testset.loc[testset['identity'] == index, 'derivatives_begin_month'] = 1 
+    testset.drop('identity', axis = 1, inplace=True) #
+
     object_col = [] 
     for col in testset.columns : 
         if testset[col].dtype == 'object' : 
@@ -112,8 +128,8 @@ def make_dataset(type) :
     testset_onehot = pd.DataFrame(enc.transform(testset.loc[:,object_col]).toarray(), columns=enc.get_feature_names(object_col))
     testset.drop(object_col, axis= 1, inplace=True)
     testset_concat = pd.concat([testset, testset_onehot], axis= 1)
-    testset_concat.loc[testset_concat.duplicated(), 'duplicated'] = 1
-    testset_concat.loc[testset_concat.duplicated() == False, 'duplicated'] = 0 
+    # testset_concat.loc[testset_concat.duplicated(), 'duplicated'] = 1
+    # testset_concat.loc[testset_concat.duplicated() == False, 'duplicated'] = 0 
 
     if type == 'train' : 
         data_x = trainset_concat.loc[:,trainset_concat.columns != 'credit']
