@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import OneHotEncoder
 import pandas as pd
 import copy
 def divide_age(dataset) : 
@@ -40,54 +40,10 @@ def scaling(dataset, columns) :
         dataset[column] = (dataset[column] - min(dataset[column])) / (max(dataset[column]) - min(dataset[column]))
     return dataset
 
-# def make_dataset(type) : 
-#     scaler = StandardScaler()
-#     trainset = pd.read_csv('train.csv')
-#     testset = pd.read_csv('test.csv')
-#     dataset = pd.concat([trainset, testset])
-
-#     # columns_numerical = ['income_total', 'DAYS_BIRTH', 'DAYS_EMPLOYED', 'begin_month']
-#     # index_retire = dataset.loc[dataset['occyp_type'].isnull() & (dataset['DAYS_EMPLOYED'] == 365243), 'occyp_type']
-#     # index_notretire = dataset.loc[dataset['occyp_type'].isnull() & (dataset['DAYS_EMPLOYED'] != 365243), 'occyp_type']
-#     dataset.loc[dataset.loc[dataset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
-#     # dataset.loc[index_retire.index, 'occyp_type'] = 'retire' 
-#     # dataset.loc[index_notretire.index, 'occyp_type'] = 'notretire' 
-#     dataset.loc[dataset['child_num'] >= 5, 'child_num'] = 5
-#     # dataset['DAYS_BIRTH'] = (-(dataset['DAYS_BIRTH']) // 30)
-#     # dataset['DAYS_EMPLOYED'] = (-(dataset['DAYS_EMPLOYED']) // 30)
-#     # dataset.loc[(dataset['DAYS_EMPLOYED'] == 0), 'DAYS_EMPLOYED'] = max(dataset['DAYS_EMPLOYED']) 
-#     # dataset['begin_month'] = (-(dataset['begin_month']))
-#     # dataset = scaling(dataset, columns_numerical)
-#     # dataset.loc[(dataset['DAYS_EMPLOYED'] == 0), 'DAYS_EMPLOYED'] = max(dataset['DAYS_EMPLOYED'])
-#     # family_size is closely correlated with child_num so delete family_size column.
-#     # dataset['child_num'].replace({0 : 'zero', 1:'one', 2 :'two', 3:'three', 4 : 'many'}, inplace=True)
-#     # dataset = divide_age(dataset)
-#     # dataset = divide_employed(dataset)
-#     # dataset = divide_begin_month(dataset)
-#     # delete unnessary variables
-#     # scaler_whole = scaler.fit(pd.get_dummies(dataset.iloc[:,:-1]).loc[:,['income_total','DAYS_BIRTH','DAYS_EMPLOYED','begin_month']])
-#     scaler_whole = scaler.fit(pd.get_dummies(dataset.loc[:,dataset.columns != 'credit']))
-
-#     if type == 'train' : 
-#         data_x_concat = dataset.loc[dataset['credit'].isnull()==False,:].loc[:,dataset.columns != 'credit']
-#         data_y_concat = dataset.loc[dataset['credit'].isnull()==False,:].loc[:, 'credit']
-#         data_x_dummy = pd.get_dummies(data_x_concat)
-#         data_x_scaled = scaler_whole.transform(data_x_dummy)
-#         # data_x_scaled = scaler_whole.transform(data_x_dummy.iloc[:,:-1].loc[:,['income_total','DAYS_BIRTH','DAYS_EMPLOYED','begin_month']])
-#         return data_x_scaled, data_y_concat
-
-#     elif type == 'test' : 
-#         data_concat = dataset.loc[dataset['credit'].isnull()==True, :].loc[:,dataset.columns != 'credit']
-#         data_x_dummy = pd.get_dummies(data_concat)
-#         data_x_scaled = scaler_whole.transform(data_x_dummy)
-#         # data_x_scaled = scaler_whole.transform(data_x_dummy.iloc[:,:-1].loc[:,['income_total','DAYS_BIRTH','DAYS_EMPLOYED','begin_month']])
-#         return data_x_scaled
 def make_dataset(type) : 
     enc = OneHotEncoder()
     trainset = pd.read_csv('train.csv')
     trainset.drop('index', axis = 1, inplace=True)
-    trainset.drop('child_num', axis = 1, inplace=True)
-    trainset.drop('family_size', axis = 1, inplace=True)
     trainset.loc[trainset.loc[trainset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
     trainset['identity'] = [str(i) + str(j) + str(k) + str(l) + str(m) for i,j,k,l,m in zip(trainset['gender'],trainset['income_total'],trainset['income_type'],trainset['DAYS_BIRTH'],trainset['DAYS_EMPLOYED'])] #
     for index, value in zip(trainset['identity'].value_counts().index, trainset['identity'].value_counts()) : #
@@ -105,12 +61,8 @@ def make_dataset(type) :
     trainset.drop(object_col, axis= 1, inplace=True)
     trainset_concat = pd.concat([trainset, trainset_onehot], axis= 1)
 
-    # trainset_concat.loc[trainset_concat.duplicated(), 'duplicated'] = 1
-    # trainset_concat.loc[trainset_concat.duplicated() == False, 'duplicated'] = 0 
     testset = pd.read_csv('test.csv')
     testset.drop('index', axis = 1, inplace=True)
-    testset.drop('child_num', axis = 1, inplace=True)
-    testset.drop('family_size', axis = 1, inplace=True)
     testset.loc[testset.loc[testset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
     testset['identity'] = [str(i) + str(j) + str(k) + str(l) + str(m) for i,j,k,l,m in zip(testset['gender'],testset['income_total'],testset['income_type'],testset['DAYS_BIRTH'],testset['DAYS_EMPLOYED'])] #
     for index, value in zip(testset['identity'].value_counts().index, testset['identity'].value_counts()) : #
@@ -129,8 +81,6 @@ def make_dataset(type) :
     testset_onehot = pd.DataFrame(enc.transform(testset.loc[:,object_col]).toarray(), columns=enc.get_feature_names(object_col))
     testset.drop(object_col, axis= 1, inplace=True)
     testset_concat = pd.concat([testset, testset_onehot], axis= 1)
-    # testset_concat.loc[testset_concat.duplicated(), 'duplicated'] = 1
-    # testset_concat.loc[testset_concat.duplicated() == False, 'duplicated'] = 0 
 
     if type == 'train' : 
         data_x = trainset_concat.loc[:,trainset_concat.columns != 'credit']

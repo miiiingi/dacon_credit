@@ -1,13 +1,7 @@
-import pandas as pd
 import argparse
-from scipy._lib.six import u
-from sklearn.svm import SVC
 from part import *
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
-from sklearn.svm import SVC 
-from sklearn.feature_selection import RFE
-from joblib import dump, load
+from joblib import dump
 from hyperopt import tpe
 from sklearn import * 
 from xgboost import XGBClassifier
@@ -39,17 +33,8 @@ if __name__ == "__main__":
     for num_iter in range(args.num_ensemble) : 
         train_x, train_y = make_dataset('train')
         search_space = hp.choice('classifier_type', [
-            # {
-            #     'type' : 'lightgbm',
-            #     'max_depth' : hp.choice('max_depth_lightgbm', np.arange(1, 100, dtype=int)),
-            #     'min_child_samples' : hp.choice('min_child_samples_lightgbm', np.arange(1, 100, dtype=int)),
-            #     'subsample' : hp.uniform('subsample_lightgbm', 0.5, 1),
-            #     'n_estimators' : hp.choice('n_estimators_lightgbm', np.arange(100, 1000, dtype = int))
-            # },
             {
                 'type' : 'xgboost',
-                # 'predictor' : 'gpu_predictor',
-                # 'tree_method' : 'gpu_hist',
                 'eval_metric' : 'mlogloss', 
                 'max_depth' : hp.choice('max_depth_xg', np.arange(3, 10, dtype=int)),
                 'subsample' : hp.uniform('subsample_xg', 0.5, 1),
@@ -66,12 +51,7 @@ if __name__ == "__main__":
         best_result = space_eval(search_space, best_result)
         type_model = best_result['type']
         del best_result['type']
-        if type_model == 'xgboost' : 
-            clf = XGBClassifier(random_state=722, use_label_encoder=False, **best_result)
-        elif type_model == 'lightgbm' : 
-            clf = LGBMClassifier(random_state=722, **best_result)
-        elif type_model == 'randomforest' : 
-            clf = RandomForestClassifier(random_state=722, **best_result)
+        clf = XGBClassifier(random_state=722, use_label_encoder=False, **best_result)
         clf.fit(train_x, train_y)
         dump(clf, 'result_{}/model_{}'.format(args.model, num_iter))
         del train_x

@@ -1,7 +1,5 @@
 from part import make_dataset
-from numpy.core.defchararray import upper
 import pandas as pd 
-import seaborn as sns
 import matplotlib.pyplot as plt
 import os
 import numpy as np 
