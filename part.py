@@ -1,7 +1,4 @@
 import numpy as np
-from numpy.lib.shape_base import column_stack
-from pandas.core.tools.datetimes import DatetimeScalar
-from scipy.sparse import data
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 import pandas as pd
 import copy
@@ -89,6 +86,8 @@ def make_dataset(type) :
     enc = OneHotEncoder()
     trainset = pd.read_csv('train.csv')
     trainset.drop('index', axis = 1, inplace=True)
+    trainset.drop('child_num', axis = 1, inplace=True)
+    trainset.drop('family_size', axis = 1, inplace=True)
     trainset.loc[trainset.loc[trainset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
     trainset['identity'] = [str(i) + str(j) + str(k) + str(l) + str(m) for i,j,k,l,m in zip(trainset['gender'],trainset['income_total'],trainset['income_type'],trainset['DAYS_BIRTH'],trainset['DAYS_EMPLOYED'])] #
     for index, value in zip(trainset['identity'].value_counts().index, trainset['identity'].value_counts()) : #
@@ -110,6 +109,8 @@ def make_dataset(type) :
     # trainset_concat.loc[trainset_concat.duplicated() == False, 'duplicated'] = 0 
     testset = pd.read_csv('test.csv')
     testset.drop('index', axis = 1, inplace=True)
+    testset.drop('child_num', axis = 1, inplace=True)
+    testset.drop('family_size', axis = 1, inplace=True)
     testset.loc[testset.loc[testset['occyp_type'].isnull(), 'occyp_type'].index, 'occyp_type'] = 'unknown' 
     testset['identity'] = [str(i) + str(j) + str(k) + str(l) + str(m) for i,j,k,l,m in zip(testset['gender'],testset['income_total'],testset['income_type'],testset['DAYS_BIRTH'],testset['DAYS_EMPLOYED'])] #
     for index, value in zip(testset['identity'].value_counts().index, testset['identity'].value_counts()) : #
